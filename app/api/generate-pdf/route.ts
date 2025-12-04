@@ -33,13 +33,28 @@ export async function POST(request: NextRequest) {
       const puppeteer = await import("puppeteer-core");
       const chromium = await import("@sparticuz/chromium");
 
+      console.log("Chromium version:", chromium.default);
+      
       const executablePath = await chromium.default.executablePath();
       console.log("Chrome executable path:", executablePath);
 
+      // Optimize Chromium args for Lambda
+      const args = [
+        ...chromium.default.args,
+        "--disable-gpu",
+        "--no-zygote",
+        "--single-process",
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+      ];
+
+      console.log("Launching with args:", args);
+
       browser = await puppeteer.default.launch({
-        args: [...chromium.default.args, "--disable-gpu", "--no-zygote"],
+        args,
         defaultViewport: { width: 1920, height: 1080 },
-        executablePath: executablePath,
+        executablePath,
         headless: true,
       });
       console.log("Browser launched successfully");
