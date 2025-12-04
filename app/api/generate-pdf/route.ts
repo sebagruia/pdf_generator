@@ -29,13 +29,15 @@ export async function POST(request: NextRequest) {
     let browser;
 
     if (isVercel) {
-      console.log("Running on Vercel, using puppeteer-core");
+      console.log("Running on Vercel, using puppeteer-core with chromium-min");
       const puppeteer = await import("puppeteer-core");
-      const chromium = await import("@sparticuz/chromium");
+      const chromium = await import("@sparticuz/chromium-min");
 
-      // executablePath() without arguments uses the default bin location
-      // and will decompress chromium to /tmp/chromium automatically
-      const executablePath = await chromium.default.executablePath();
+      // Use chromium pack from GitHub releases
+      // Downloads and extracts chromium binaries on first run, cached in /tmp for subsequent requests
+      const executablePath = await chromium.default.executablePath(
+        "https://github.com/Sparticuz/chromium/releases/download/v141.0.0/chromium-v141.0.0-pack.tar"
+      );
 
       console.log("Chrome executable path:", executablePath);
 

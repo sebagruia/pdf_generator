@@ -11,7 +11,7 @@ importers:
 
   .:
     dependencies:
-      '@sparticuz/chromium':
+      '@sparticuz/chromium-min':
         specifier: ^141.0.0
         version: 141.0.0
       next:
@@ -415,8 +415,8 @@ packages:
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
 
-  '@sparticuz/chromium@141.0.0':
-    resolution: {integrity: sha512-JsTp4AqgStkqKki4dUpEM0GoisAjQhsqZ1lQTNMSKK5A9pw6BbIuIvv2HVYMYzSZGyDdQNJYBPPDg2eggCkezA==}
+  '@sparticuz/chromium-min@141.0.0':
+    resolution: {integrity: sha512-1EAR1NBrY4sa0hysDUCxCSI+9xc88/LYB3YjWFqMMu3CF82ATp8FzOeu7icwGxI02NAPcwzb0Uf1kIzsfH7Eiw==}
     engines: {node: '>=20.11.0'}
 
   '@swc/helpers@0.5.15':
@@ -2412,7 +2412,7 @@ snapshots:
 
   '@rtsao/scc@1.1.0': {}
 
-  '@sparticuz/chromium@141.0.0':
+  '@sparticuz/chromium-min@141.0.0':
     dependencies:
       follow-redirects: 1.15.11
       tar-fs: 3.1.1
