@@ -33,9 +33,10 @@ export async function POST(request: NextRequest) {
       const puppeteer = await import("puppeteer-core");
       const chromium = await import("@sparticuz/chromium");
 
-      console.log("Chromium version:", chromium.default);
-
+      // executablePath() without arguments uses the default bin location
+      // and will decompress chromium to /tmp/chromium automatically
       const executablePath = await chromium.default.executablePath();
+
       console.log("Chrome executable path:", executablePath);
 
       browser = await puppeteer.default.launch({
