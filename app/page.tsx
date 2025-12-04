@@ -3,30 +3,29 @@
 import { useState } from "react";
 import styles from "./page.module.css";
 
-const defaultHtml = `<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    h1 { color: #333; }
-    p { line-height: 1.6; }
-  </style>
-</head>
-<body>
-  <h1>Sample PDF Document</h1>
-  <p>This is a sample HTML document that will be converted to PDF.</p>
-  <p>You can customize this HTML with your own content, styles, and structure.</p>
-</body>
-</html>`;
-
 export default function Home() {
-  const [html, setHtml] = useState(defaultHtml);
+  const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [dummyLoading, setDummyLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!url.trim()) {
+      setError("Please enter a URL");
+      return;
+    }
+
+    // Basic URL validation
+    try {
+      new URL(url);
+    } catch {
+      setError("Please enter a valid URL (e.g., https://example.com)");
+      return;
+    }
+
     setLoading(true);
     setError(null);
     setPdfUrl(null);
@@ -37,7 +36,7 @@ export default function Home() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ html }),
+        body: JSON.stringify({ url }),
       });
 
       if (!response.ok) {
@@ -45,10 +44,9 @@ export default function Home() {
         throw new Error(errorData.error || "Failed to generate PDF");
       }
 
-      // Create a blob from the response
       const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      setPdfUrl(url);
+      const pdfBlobUrl = URL.createObjectURL(blob);
+      setPdfUrl(pdfBlobUrl);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "An unexpected error occurred"
@@ -62,29 +60,61 @@ export default function Home() {
     if (pdfUrl) {
       const a = document.createElement("a");
       a.href = pdfUrl;
-      a.download = `generated-${Date.now()}.pdf`;
+      a.download = `page-${Date.now()}.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
     }
   };
 
+  const handleDummyPagePdf = async () => {
+    setDummyLoading(true);
+    setError(null);
+    setPdfUrl(null);
+
+    try {
+      const dummyPageUrl = `${window.location.origin}/dummyPage`;
+
+      const response = await fetch("/api/generate-pdf", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url: dummyPageUrl }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to generate PDF");
+      }
+
+      const blob = await response.blob();
+      const pdfBlobUrl = URL.createObjectURL(blob);
+      setPdfUrl(pdfBlobUrl);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred"
+      );
+    } finally {
+      setDummyLoading(false);
+    }
+  };
+
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <h1 className={styles.title}>HTML to PDF Generator</h1>
+        <h1 className={styles.title}>URL to PDF Generator</h1>
         <p className={styles.description}>
-          Paste your HTML content below and click Generate PDF to convert it to
-          a downloadable PDF file.
+          Enter any webpage URL to convert it to a downloadable PDF.
         </p>
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          <textarea
-            className={styles.textarea}
-            value={html}
-            onChange={(e) => setHtml(e.target.value)}
-            placeholder="Paste your HTML content here..."
-            rows={15}
+          <input
+            type="text"
+            className={styles.urlInput}
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            placeholder="https://example.com"
             required
           />
 
@@ -92,9 +122,18 @@ export default function Home() {
             <button
               type="submit"
               className={styles.submitButton}
-              disabled={loading || !html.trim()}
+              disabled={loading || !url.trim()}
             >
               {loading ? "Generating PDF..." : "Generate PDF"}
+            </button>
+
+            <button
+              type="button"
+              onClick={handleDummyPagePdf}
+              className={styles.dummyButton}
+              disabled={dummyLoading}
+            >
+              {dummyLoading ? "Generating..." : "Generate PDF from Demo Page"}
             </button>
 
             {pdfUrl && (
@@ -121,6 +160,26 @@ export default function Home() {
             </div>
           )}
         </form>
+
+        <div className={styles.tips}>
+          <h3>Tips:</h3>
+          <ul>
+            <li>Enter the full URL including https://</li>
+            <li>The page must be publicly accessible</li>
+            <li>
+              All styles, images, and fonts will be included automatically
+            </li>
+            <li>
+              Generation may take 5-30 seconds depending on page complexity
+            </li>
+            <li>
+              <a href="/dummypage" target="_blank" rel="noopener noreferrer">
+                View demo page
+              </a>{" "}
+              (try the &quot;Generate PDF from Demo Page&quot; button)
+            </li>
+          </ul>
+        </div>
       </main>
     </div>
   );

@@ -60,22 +60,16 @@
   gap: 24px;
 }
 
-.textarea {
+.urlInput {
   width: 100%;
   padding: 16px;
-  font-size: 14px;
-  font-family: "Monaco", "Courier New", monospace;
-  line-height: 1.6;
+  font-size: 16px;
   border: 2px solid #e5e5e5;
   border-radius: 8px;
-  resize: vertical;
-  min-height: 300px;
-  background-color: #fafafa;
-  color: var(--text-primary);
   transition: border-color 0.2s;
 }
 
-.textarea:focus {
+.urlInput:focus {
   outline: none;
   border-color: var(--button-primary);
 }
@@ -131,6 +125,37 @@
   box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
 }
 
+.dummyButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 48px;
+  padding: 0 32px;
+  font-size: 16px;
+  font-weight: 600;
+  border: 2px solid var(--button-primary);
+  background-color: transparent;
+  color: var(--button-primary);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 160px;
+}
+
+.dummyButton:hover:not(:disabled) {
+  background-color: var(--button-primary);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.dummyButton:disabled {
+  border-color: #ccc;
+  color: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .error {
   width: 100%;
   padding: 16px;
@@ -171,20 +196,50 @@
     font-size: 16px;
   }
 
-  .textarea {
-    min-height: 250px;
-    font-size: 13px;
-  }
-
   .actions {
     flex-direction: column;
     width: 100%;
   }
 
   .submitButton,
-  .downloadButton {
+  .downloadButton,
+  .dummyButton {
     width: 100%;
   }
+}
+
+.tips {
+  width: 100%;
+  margin-top: 32px;
+  padding: 24px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid var(--button-primary);
+}
+
+.tips h3 {
+  margin: 0 0 12px 0;
+  font-size: 18px;
+  color: var(--text-primary);
+}
+
+.tips ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.tips li {
+  margin: 8px 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.tips code {
+  background-color: #e5e5e5;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: "Monaco", "Courier New", monospace;
+  font-size: 13px;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -209,13 +264,13 @@
     box-shadow: 0 1px 3px rgba(255, 255, 255, 0.05);
   }
 
-  .textarea {
+  .urlInput {
     background-color: #0a0a0a;
     border-color: #333;
     color: var(--text-primary);
   }
 
-  .textarea:focus {
+  .urlInput:focus {
     border-color: var(--button-primary);
   }
 
@@ -230,6 +285,34 @@
 
   .submitButton:disabled {
     background-color: #333;
+    color: #666;
+  }
+
+  .tips {
+    background-color: #1a1a1a;
+    border-left-color: var(--button-primary);
+  }
+
+  .tips code {
+    background-color: #2a2a2a;
+  }
+
+  .tips a {
+    color: var(--button-primary);
+  }
+
+  .dummyButton {
+    border-color: var(--button-primary);
+    color: var(--button-primary);
+  }
+
+  .dummyButton:hover:not(:disabled) {
+    background-color: var(--button-primary);
+    color: #000;
+  }
+
+  .dummyButton:disabled {
+    border-color: #333;
     color: #666;
   }
 }
