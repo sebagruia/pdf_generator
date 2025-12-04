@@ -34,25 +34,12 @@ export async function POST(request: NextRequest) {
       const chromium = await import("@sparticuz/chromium");
 
       console.log("Chromium version:", chromium.default);
-      
+
       const executablePath = await chromium.default.executablePath();
       console.log("Chrome executable path:", executablePath);
 
-      // Optimize Chromium args for Lambda
-      const args = [
-        ...chromium.default.args,
-        "--disable-gpu",
-        "--no-zygote",
-        "--single-process",
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-dev-shm-usage",
-      ];
-
-      console.log("Launching with args:", args);
-
       browser = await puppeteer.default.launch({
-        args,
+        args: chromium.default.args,
         defaultViewport: { width: 1920, height: 1080 },
         executablePath,
         headless: true,
@@ -70,17 +57,23 @@ export async function POST(request: NextRequest) {
     try {
       const page = await browser.newPage();
 
-      // Navigate to the URL
+      console.log("Navigating to:", url);
+
+      // Navigate to the URL with optimized settings for memory
       await page.goto(url, {
-        waitUntil: "networkidle0",
+        waitUntil: "networkidle2", // More memory-efficient than networkidle0
         timeout: 30000,
       });
+
+      console.log("Page loaded, generating PDF");
 
       const pdfBuffer = await page.pdf({
         format: "A4",
         printBackground: true,
         margin: { top: "20px", right: "20px", bottom: "20px", left: "20px" },
       });
+
+      console.log("PDF generated, size:", pdfBuffer.length, "bytes");
 
       await browser.close();
 
