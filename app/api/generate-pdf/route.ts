@@ -110,7 +110,10 @@ export async function POST(request: NextRequest) {
       }
 
       // In development/testing, return the actual error
-      if (process.env.NODE_ENV === "development" || process.env.VERCEL_ENV === "preview") {
+      if (
+        process.env.NODE_ENV === "development" ||
+        process.env.VERCEL_ENV === "preview"
+      ) {
         return NextResponse.json(
           { error: `Failed to generate PDF: ${error.message}` },
           { status: 500 }
