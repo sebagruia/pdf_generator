@@ -29,16 +29,22 @@ export async function POST(request: NextRequest) {
     let browser;
 
     if (isVercel) {
+      console.log("Running on Vercel, using puppeteer-core");
       const puppeteer = await import("puppeteer-core");
       const chromium = await import("@sparticuz/chromium");
 
+      const executablePath = await chromium.default.executablePath();
+      console.log("Chrome executable path:", executablePath);
+
       browser = await puppeteer.default.launch({
-        args: chromium.default.args,
+        args: [...chromium.default.args, "--disable-gpu", "--no-zygote"],
         defaultViewport: { width: 1920, height: 1080 },
-        executablePath: await chromium.default.executablePath(),
+        executablePath: executablePath,
         headless: true,
       });
+      console.log("Browser launched successfully");
     } else {
+      console.log("Running locally, using puppeteer");
       const puppeteer = await import("puppeteer");
       browser = await puppeteer.default.launch({
         headless: true,
@@ -77,6 +83,7 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error("PDF generation error:", error);
+    console.error("Error stack:", error instanceof Error ? error.stack : "N/A");
 
     if (error instanceof Error) {
       if (error.message.includes("timeout")) {
@@ -99,6 +106,14 @@ export async function POST(request: NextRequest) {
               "Failed to access the URL. Please check that it's publicly accessible.",
           },
           { status: 422 }
+        );
+      }
+
+      // In development/testing, return the actual error
+      if (process.env.NODE_ENV === "development" || process.env.VERCEL_ENV === "preview") {
+        return NextResponse.json(
+          { error: `Failed to generate PDF: ${error.message}` },
+          { status: 500 }
         );
       }
     }
